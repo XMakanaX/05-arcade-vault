@@ -1,6 +1,6 @@
 # SPEC 02 — Home: pantalla de inicio (landing)
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** 01-mvp-pantallas-visuales
 > **Date:** 2026-07-13
 > **Objective:** Portar `home.jsx` del template como nueva ruta `/` (landing), moviendo la Biblioteca actual a `/biblioteca` y actualizando el Nav, sin implementar `about.jsx`.
