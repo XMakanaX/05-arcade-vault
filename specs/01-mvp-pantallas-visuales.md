@@ -1,6 +1,6 @@
 # SPEC 01 — MVP visual: pantallas de Arcade Vault
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** —
 > **Date:** 2026-07-13
 > **Objective:** Portar las 5 pantallas del prototipo en `references/templates/` a la app Next.js como rutas reales App Router, solo la capa visual, sin ningún juego funcional.
@@ -101,14 +101,14 @@ Cada paso deja la app compilando y navegable.
 
 ## Acceptance criteria
 
-- [ ] `npm run dev` arranca sin errores y `npm run build` compila sin errores de tipos.
-- [ ] `/` muestra el grid con los 8 juegos; escribir en el buscador filtra por título; los chips filtran por categoría; sin coincidencias aparece "NO HAY RESULTADOS".
-- [ ] Click en una tarjeta (o en JUGAR) navega a `/juego/[id]` con la URL correcta.
-- [ ] `/juego/bloque-buster` muestra portada, descripción larga, `stat-strip` y leaderboard; un id inexistente (`/juego/nope`) responde con página 404.
-- [ ] Desde el detalle, "JUGAR AHORA" navega a `/juego/[id]/jugar` y muestra el HUD + pantalla CRT; la puntuación se incrementa sola, PAUSA la congela, FIN abre el modal de game-over.
-- [ ] `/salon` cambia de juego con las tabs y muestra podio + tabla; tras iniciar sesión aparece la fila "TU MEJOR MARCA".
-- [ ] `/acceder` alterna las tabs iniciar sesión / crear cuenta (el campo correo aparece solo en crear cuenta); enviar el formulario o "JUGAR COMO INVITADO" navega a `/` y el Nav refleja el estado de sesión.
-- [ ] La navegación entre pantallas usa `next/link` y el enlace activo del Nav corresponde a la ruta actual.
+- [x] `npm run dev` arranca sin errores y `npm run build` compila sin errores de tipos.
+- [x] `/` muestra el grid con los 8 juegos; escribir en el buscador filtra por título; los chips filtran por categoría; sin coincidencias aparece "NO HAY RESULTADOS".
+- [x] Click en una tarjeta (o en JUGAR) navega a `/juego/[id]` con la URL correcta.
+- [x] `/juego/bloque-buster` muestra portada, descripción larga, `stat-strip` y leaderboard; un id inexistente (`/juego/nope`) responde con página 404.
+- [x] Desde el detalle, "JUGAR AHORA" navega a `/juego/[id]/jugar` y muestra el HUD + pantalla CRT; la puntuación se incrementa sola, PAUSA la congela, FIN abre el modal de game-over.
+- [x] `/salon` cambia de juego con las tabs y muestra podio + tabla; tras iniciar sesión aparece la fila "TU MEJOR MARCA".
+- [x] `/acceder` alterna las tabs iniciar sesión / crear cuenta (el campo correo aparece solo en crear cuenta); enviar el formulario o "JUGAR COMO INVITADO" navega a `/` y el Nav refleja el estado de sesión.
+- [x] La navegación entre pantallas usa `next/link` y el enlace activo del Nav corresponde a la ruta actual.
 
 ---
 
