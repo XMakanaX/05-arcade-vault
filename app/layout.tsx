@@ -39,7 +39,7 @@ export default function RootLayout({
       lang="es"
       className={`${pixel.variable} ${mono.variable} ${courier.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col" suppressHydrationWarning>
         <div className="av-bg" />
         <div className="av-noise" />
         <div id="root">
