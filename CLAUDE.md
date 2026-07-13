@@ -22,24 +22,12 @@ Arcade Vault — online arcade platform, play games, compete for high scores (se
 
 Heed deprecation notices found there over prior Next.js knowledge.
 
+## Skills 
+Usa siempre /frontend-design para diseñar ña interfaz de usuario.
+
 ## Spec-driven workflow
 
-This repo follows spec-driven design via `/spec` and `/spec-impl` commands, based on https://github.com/Klerith/fernando-skills. Skills are installed via:
-
-```bash
-npx skills@latest add Klerith/fernando-skills
-```
-
-## Commands
-
-```bash
-npm run dev      # start dev server
-npm run build    # production build
-npm run start    # run production build
-npm run lint     # eslint (flat config, eslint-config-next core-web-vitals + typescript)
-```
-
-No test runner is configured yet.
+This repo follows spec-driven design via `/spec` and `/spec-impl` commands, based on https://github.com/Klerith/fernando-skills.
 
 ## Architecture
 
