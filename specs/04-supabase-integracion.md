@@ -1,6 +1,6 @@
 # SPEC 04 — Integración base de Supabase con Next.js
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** —
 > **Date:** 2026-07-14
 > **Objective:** Instalar y configurar el cliente de Supabase (browser + server) en Next.js con verificación de conexión vía `/api/health`, sin implementar todavía auth real, tablas ni middleware de sesión.
@@ -40,13 +40,13 @@
 
 ## Acceptance criteria
 
-- [ ] `@supabase/supabase-js` y `@supabase/ssr` agregados a `package.json`.
-- [ ] `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_ANON_KEY` presentes en `.env.template` (vacíos) y `.env.local` (valores reales).
-- [ ] `app/lib/supabase/client.ts` exporta un cliente browser funcional (`createBrowserClient`).
-- [ ] `app/lib/supabase/server.ts` exporta un cliente server funcional (`createServerClient` con `cookies()` async).
-- [ ] `npm run build` compila sin errores de tipos.
-- [ ] `GET /api/health` responde `{ ok: true }` con status 200 contra el proyecto real.
-- [ ] Ninguna key de Supabase (service role, DB password) queda expuesta en código cliente — solo `NEXT_PUBLIC_*` (anon key, segura para exponer) se usa en `app/lib/supabase/client.ts`.
+- [x] `@supabase/supabase-js` y `@supabase/ssr` agregados a `package.json`.
+- [x] `NEXT_PUBLIC_SUPABASE_URL` y `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` presentes en `.env.template` (vacíos) y `.env.local` (valores reales). (renombrado desde `ANON_KEY`, ver Decisions)
+- [x] `app/lib/supabase/client.ts` exporta un cliente browser funcional (`createBrowserClient`).
+- [x] `app/lib/supabase/server.ts` exporta un cliente server funcional (`createServerClient` con `cookies()` async).
+- [x] `npm run build` compila sin errores de tipos.
+- [x] `GET /api/health` responde `{ ok: true }` con status 200 contra el proyecto real.
+- [x] Ninguna key de Supabase (service role, DB password) queda expuesta en código cliente — solo `NEXT_PUBLIC_*` (publishable key, segura para exponer) se usa en `app/lib/supabase/client.ts`.
 
 ---
 
@@ -57,3 +57,4 @@
 - **Sí:** `/api/health` como verificación de conexión (llama `auth.getSession()`) en vez de depender de una tabla que todavía no existe.
 - **Sí:** cliente server usa `cookies()` async — confirmado contra `node_modules/next/dist/docs` que esta versión de Next (16.2.10) mantiene la API async introducida en v15.
 - **No:** middleware de refresco de sesión — se agrega junto con la spec de Auth, cuando haya sesión real que refrescar.
+- **Sí:** variable renombrada a `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` (en vez de `NEXT_PUBLIC_SUPABASE_ANON_KEY` como decía la spec original) — decisión del usuario durante implementación, ya que `.env.local`/`.env.template` ya traían ese nombre con la publishable key moderna (`sb_publishable_...`), formato recomendado por Supabase sobre la legacy anon JWT key.
