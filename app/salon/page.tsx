@@ -1,18 +1,47 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { GAMES } from "@/app/data/games";
-import { seededScores } from "@/app/data/leaderboard";
+import { createClient } from "@/app/lib/supabase/client";
+import { getGames, getTopScores, type Game, type ScoreRow } from "@/app/lib/supabase/queries";
 import { useSession } from "@/app/components/session-context";
 
 export default function SalonPage() {
   const { user } = useSession();
-  const [tab, setTab] = useState(GAMES[0].id);
-  const rows = useMemo(() => seededScores(tab.length * 23 + 7, 12), [tab]);
-  const game = GAMES.find((g) => g.id === tab)!;
-  const youRank = user ? Math.floor(8 + (tab.length % 4)) : null;
+  const [games, setGames] = useState<Game[]>([]);
+  const [tab, setTab] = useState<string | null>(null);
+  const [rows, setRows] = useState<ScoreRow[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    getGames(supabase).then((g) => {
+      setGames(g);
+      setTab(g[0]?.id ?? null);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!tab) return;
+    const supabase = createClient();
+    getTopScores(supabase, tab, 12).then(setRows);
+  }, [tab]);
+
+  const game = games.find((g) => g.id === tab);
+  const youRank = user && tab ? Math.floor(8 + (tab.length % 4)) : null;
   const youScore = user ? rows[5]?.score - 2400 : null;
+
+  if (!game || rows.length === 0) {
+    return (
+      <div className="av-hall fade-in">
+        <div className="hall-head">
+          <h1>SALÓN DE LA FAMA</h1>
+          <p className="pixel" style={{ fontSize: 10 }}>
+            LOS NOMBRES QUE NUNCA SE BORRAN DE LA PANTALLA
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="av-hall fade-in">
@@ -24,7 +53,7 @@ export default function SalonPage() {
       </div>
 
       <div className="hall-tabs">
-        {GAMES.map((g) => (
+        {games.map((g) => (
           <button
             key={g.id}
             className={"chip" + (tab === g.id ? " active" : "")}
@@ -43,7 +72,10 @@ export default function SalonPage() {
           <div className="date">{rows[1].date}</div>
         </div>
         <div className="podium-slot gold">
-          <div className="pixel" style={{ fontSize: 9, color: "var(--gold)", letterSpacing: "0.18em" }}>
+          <div
+            className="pixel"
+            style={{ fontSize: 9, color: "var(--gold)", letterSpacing: "0.18em" }}
+          >
             CAMPEÓN
           </div>
           <div className="rank-num" style={{ fontSize: 36, marginTop: 4 }}>
@@ -92,7 +124,10 @@ export default function SalonPage() {
               <div className="pl" style={{ color: "var(--yellow)" }}>
                 {user.name}
               </div>
-              <div className="sc" style={{ color: "var(--yellow)", textShadow: "0 0 6px rgba(245,255,0,0.5)" }}>
+              <div
+                className="sc"
+                style={{ color: "var(--yellow)", textShadow: "0 0 6px rgba(245,255,0,0.5)" }}
+              >
                 {(youScore || 9999).toLocaleString("es-ES")}
               </div>
               <div className="dt">11/05/2026</div>

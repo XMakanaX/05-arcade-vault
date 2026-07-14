@@ -2,9 +2,9 @@
 
 import { useRef } from "react";
 import Link from "next/link";
-import type { Game } from "@/app/data/games";
+import type { Game } from "@/app/lib/supabase/queries";
 
-export default function GameCard({ game }: { game: Game }) {
+export default function GameCard({ game, best }: { game: Game; best: number }) {
   const tiltRef = useRef<HTMLAnchorElement>(null);
 
   const onMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
@@ -40,15 +40,16 @@ export default function GameCard({ game }: { game: Game }) {
         <div className="row">
           <div className="score-badge">
             <span>MEJOR PUNTUACIÓN</span>
-            <b>{game.best.toLocaleString("es-ES")}</b>
+            <b>{best.toLocaleString("es-ES")}</b>
           </div>
-          <button
+          <span
             className={
-              "btn " + (game.color === "magenta" ? "magenta" : game.color === "yellow" ? "yellow" : "")
+              "btn " +
+              (game.color === "magenta" ? "magenta" : game.color === "yellow" ? "yellow" : "")
             }
           >
             JUGAR
-          </button>
+          </span>
         </div>
       </div>
     </Link>
