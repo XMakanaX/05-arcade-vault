@@ -982,6 +982,7 @@ a {
 
 .crt {
   position: relative;
+  width: 100%;
   border-radius: 28px;
   background: #050507;
   padding: 24px;
