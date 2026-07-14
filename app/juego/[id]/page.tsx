@@ -1,18 +1,19 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { GAMES } from "@/app/data/games";
-import { seededScores } from "@/app/data/leaderboard";
-
-export async function generateStaticParams() {
-  return GAMES.map((g) => ({ id: g.id }));
-}
+import { createClient } from "@/app/lib/supabase/server";
+import { getGame, getTopScores, getScoreCount } from "@/app/lib/supabase/queries";
 
 export default async function GameDetailPage({ params }: PageProps<"/juego/[id]">) {
   const { id } = await params;
-  const game = GAMES.find((g) => g.id === id);
+  const supabase = await createClient();
+  const game = await getGame(supabase, id);
   if (!game) notFound();
 
-  const scores = seededScores(id.length * 17 + 3, 10);
+  const [scores, playCount] = await Promise.all([
+    getTopScores(supabase, id, 10),
+    getScoreCount(supabase, id),
+  ]);
+  const best = scores[0]?.score ?? 0;
 
   return (
     <div className="av-detail fade-in">
@@ -32,7 +33,7 @@ export default async function GameDetailPage({ params }: PageProps<"/juego/[id]"
           <div className="stat-strip">
             <div>
               <div className="l">Partidas</div>
-              <div className="v">{game.plays}</div>
+              <div className="v">{playCount}</div>
             </div>
             <div>
               <div className="l">Mejor global</div>
@@ -40,7 +41,7 @@ export default async function GameDetailPage({ params }: PageProps<"/juego/[id]"
                 className="v"
                 style={{ color: "var(--magenta)", textShadow: "0 0 6px rgba(255,0,110,0.5)" }}
               >
-                {game.best.toLocaleString("es-ES")}
+                {best.toLocaleString("es-ES")}
               </div>
             </div>
             <div>
@@ -70,7 +71,9 @@ export default async function GameDetailPage({ params }: PageProps<"/juego/[id]"
           {scores.map((r, i) => (
             <div
               key={r.name}
-              className={"lb-row" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")}
+              className={
+                "lb-row" + (i === 0 ? " top1" : i === 1 ? " top2" : i === 2 ? " top3" : "")
+              }
             >
               <div className="rk">#{String(r.rank).padStart(2, "0")}</div>
               <div className="pl">

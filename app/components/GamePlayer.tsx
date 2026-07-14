@@ -2,9 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import type { Game } from "@/app/data/games";
+import type { Game } from "@/app/lib/supabase/queries";
+import { insertScore } from "@/app/lib/supabase/queries";
+import { createClient } from "@/app/lib/supabase/client";
 import { useSession } from "./session-context";
 import { initAsteroids, type AsteroidsEngine } from "@/app/games/asteroids/engine";
+
+type SaveState = "idle" | "saving" | "saved" | "error";
 
 export default function GamePlayer({ game }: { game: Game }) {
   const router = useRouter();
@@ -17,7 +21,7 @@ export default function GamePlayer({ game }: { game: Game }) {
   const [paused, setPaused] = useState(false);
   const [over, setOver] = useState(false);
   const [name, setName] = useState(user ? user.name : "INVITADO");
-  const [saved, setSaved] = useState(false);
+  const [saveState, setSaveState] = useState<SaveState>("idle");
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<AsteroidsEngine | null>(null);
@@ -40,7 +44,6 @@ export default function GamePlayer({ game }: { game: Game }) {
       engine.destroy();
       engineRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isAsteroids, game.id]);
 
   // Placeholder falso para el resto del catálogo.
@@ -55,6 +58,14 @@ export default function GamePlayer({ game }: { game: Game }) {
     if (isAsteroids) return;
     if (score > 0 && score % 2500 < 100) setLevel((l) => l + 1);
   }, [isAsteroids, score]);
+
+  const saveScore = () => {
+    setSaveState("saving");
+    const supabase = createClient();
+    insertScore(supabase, game.id, name, score)
+      .then(() => setSaveState("saved"))
+      .catch(() => setSaveState("error"));
+  };
 
   const togglePause = () => {
     if (isAsteroids && engineRef.current) {
@@ -75,7 +86,7 @@ export default function GamePlayer({ game }: { game: Game }) {
     setLevel(1);
     setPaused(false);
     setOver(false);
-    setSaved(false);
+    setSaveState("idle");
     if (isAsteroids) engineRef.current?.restart();
   };
 
@@ -162,19 +173,29 @@ export default function GamePlayer({ game }: { game: Game }) {
             <h2>FIN DEL JUEGO</h2>
             <div className="final-label">PUNTUACIÓN FINAL</div>
             <div className="final">{score.toLocaleString("es-ES")}</div>
-            {!saved ? (
+            {saveState === "idle" && (
               <div className="input-row">
                 <input
                   value={name}
                   onChange={(e) => setName(e.target.value.toUpperCase().slice(0, 10))}
                   placeholder="TUS INICIALES"
                 />
-                <button className="btn yellow" onClick={() => setSaved(true)}>
+                <button className="btn yellow" onClick={saveScore} disabled={!name.trim()}>
                   GUARDAR PUNTUACIÓN
                 </button>
               </div>
-            ) : (
-              <div className="toast-saved">▸ PUNTUACIÓN GUARDADA_</div>
+            )}
+            {saveState === "saving" && <div className="toast-saved">▸ GUARDANDO PUNTUACIÓN…</div>}
+            {saveState === "saved" && (
+              <div className="toast-saved">▸ PUNTUACIÓN GUARDADA COMO {name}_</div>
+            )}
+            {saveState === "error" && (
+              <div className="input-row">
+                <div className="toast-saved">▸ NO SE PUDO GUARDAR_</div>
+                <button className="btn yellow" onClick={saveScore}>
+                  REINTENTAR
+                </button>
+              </div>
             )}
             <div className="actions">
               <button className="btn" onClick={restart}>
