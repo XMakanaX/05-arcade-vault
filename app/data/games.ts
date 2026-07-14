@@ -92,6 +92,17 @@ export const GAMES: Game[] = [
     plays: "6.4K",
   },
   {
+    id: "asteroides",
+    title: "ASTEROIDES",
+    short: "Pulveriza rocas de verdad en gravedad cero.",
+    long: "Clon jugable de Asteroids: rota, propulsa y dispara para partir rocas en fragmentos cada vez más pequeños. Recoge el power-up de disparo triple y sobrevive con tus 3 vidas.",
+    cat: "SHOOTER",
+    cover: "cover-rocas",
+    color: "yellow",
+    best: 41200,
+    plays: "0",
+  },
+  {
     id: "duelo-pixel",
     title: "DUELO PIXEL",
     short: "Dos paletas. Una pelota. Reflejos máximos.",
