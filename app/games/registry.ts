@@ -1,6 +1,7 @@
 import { initAsteroids } from "@/app/games/asteroids/engine";
 import type { AsteroidsCallbacks, AsteroidsEngine } from "@/app/games/asteroids/engine";
 import { initTetris } from "@/app/games/tetris/engine";
+import { initArkanoid } from "@/app/games/arkanoid/engine";
 
 export type EngineInit = (canvas: HTMLCanvasElement, cb: AsteroidsCallbacks) => AsteroidsEngine;
 
@@ -8,4 +9,5 @@ export type EngineInit = (canvas: HTMLCanvasElement, cb: AsteroidsCallbacks) => 
 export const engineRegistry: Partial<Record<string, EngineInit>> = {
   asteroides: initAsteroids,
   tetris: initTetris,
+  arkanoid: initArkanoid,
 };
