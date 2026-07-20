@@ -1031,6 +1031,7 @@ a {
   height: 100%;
   display: block;
   image-rendering: pixelated;
+  object-fit: contain;
 }
 .crt-content {
   position: absolute;

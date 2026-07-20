@@ -1,6 +1,6 @@
 # SPEC 07 — Integración de Tetris al arcade
 
-> **Status:** Aprobado
+> **Status:** Implementado
 > **Depends on:** SPEC 05, SPEC 06
 > **Date:** 2026-07-20
 > **Objective:** Portar `references/started-games/03-tetris/game.js` a un motor TS con el contrato estándar, registrarlo en un `registry.ts` nuevo (migrando asteroides), y sembrar su fila + scores en Supabase.
@@ -63,15 +63,22 @@ Estado interno del motor (dentro de la clausura, no global de módulo): `board` 
 
 ## Acceptance criteria
 
-- [ ] `app/games/tetris/engine.ts` exporta `initTetris` con `init/pause/resume/restart/destroy`, sin `any`, sin estado global de módulo.
-- [ ] `GamePlayer.tsx` monta el motor de tetris vía `engineRegistry`, no una rama `if` nueva.
-- [ ] Fila `tetris` existe en `games` (verificable con `list_tables`/`execute_sql`).
-- [ ] `/biblioteca` muestra la tarjeta de Tetris junto a asteroides, sin regresión.
-- [ ] `/juego/tetris` y `/juego/tetris/jugar` funcionan; jugar una partida hasta game-over inserta un score real en `scores`.
-- [ ] Rotación (`ArrowUp`/`KeyX`), movimiento lateral, soft drop y hard drop (`Space`) responden igual que el original.
-- [ ] Limpiar una línea suma puntos según `LINE_SCORES[cleared] * level` y sube `level`/`dropInterval` como en el original.
-- [ ] `npm run build` compila sin errores.
-- [ ] Asteroides sigue jugable sin regresión tras el refactor del registro.
+- [x] `app/games/tetris/engine.ts` exporta `initTetris` con `init/pause/resume/restart/destroy`, sin `any`, sin estado global de módulo.
+- [x] `GamePlayer.tsx` monta el motor de tetris vía `engineRegistry`, no una rama `if` nueva.
+- [x] Fila `tetris` existe en `games` (verificado con `execute_sql`).
+- [x] `/biblioteca` muestra la tarjeta de Tetris junto a asteroides, sin regresión.
+- [x] `/juego/tetris` y `/juego/tetris/jugar` funcionan; se jugó una partida hasta game-over y se confirmó el insert real en `scores`.
+- [x] Rotación (`ArrowUp`/`KeyX`), movimiento lateral, soft drop y hard drop (`Space`) responden igual que el original.
+- [x] Limpiar una línea suma puntos según `LINE_SCORES[cleared] * level` y sube `level`/`dropInterval` como en el original (lógica portada 1:1 del original, no ejercitada directamente en la sesión de pruebas por requerir llenar una fila completa).
+- [x] `npm run build` compila sin errores.
+- [x] Asteroides sigue jugable sin regresión tras el refactor del registro.
+
+---
+
+## Notas de implementación (fuera del alcance original, resueltas durante verificación)
+
+- `.game-canvas` se deformaba dentro de `.crt-screen` (aspect-ratio 16/10 fijo, pensado para Asteroides 800×600) al montar el canvas portrait de Tetris (300×600). Fix: `object-fit: contain` en `.game-canvas` (`app/globals.css`) — también corrige la relación de aspecto de Asteroides.
+- `/salon` crasheaba (`TypeError` leyendo `rows[1]`/`rows[2]`) cuando el juego con tab por defecto tenía menos de 3 scores en `scores` (bug preexistente, no causado por este spec). Fix: guardas condicionales en el podio de plata/bronce (`app/salon/page.tsx`).
 
 ---
 

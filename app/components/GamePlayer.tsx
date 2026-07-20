@@ -6,14 +6,15 @@ import type { Game } from "@/app/lib/supabase/queries";
 import { insertScore } from "@/app/lib/supabase/queries";
 import { createClient } from "@/app/lib/supabase/client";
 import { useSession } from "./session-context";
-import { initAsteroids, type AsteroidsEngine } from "@/app/games/asteroids/engine";
+import { engineRegistry } from "@/app/games/registry";
+import type { AsteroidsEngine } from "@/app/games/asteroids/engine";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
 export default function GamePlayer({ game }: { game: Game }) {
   const router = useRouter();
   const { user } = useSession();
-  const isAsteroids = game.id === "asteroides";
+  const engineInit = engineRegistry[game.id];
 
   const [score, setScore] = useState(0);
   const [lives, setLives] = useState(3);
@@ -26,13 +27,13 @@ export default function GamePlayer({ game }: { game: Game }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<AsteroidsEngine | null>(null);
 
-  // Motor real de Asteroides — se monta/desmonta solo para game.id === "asteroides".
+  // Motor real registrado — se monta/desmonta solo cuando game.id tiene entrada en engineRegistry.
   useEffect(() => {
-    if (!isAsteroids) return;
+    if (!engineInit) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    const engine = initAsteroids(canvas, {
+    const engine = engineInit(canvas, {
       onScore: setScore,
       onLives: setLives,
       onLevel: setLevel,
@@ -44,20 +45,20 @@ export default function GamePlayer({ game }: { game: Game }) {
       engine.destroy();
       engineRef.current = null;
     };
-  }, [isAsteroids, game.id]);
+  }, [engineInit, game.id]);
 
   // Placeholder falso para el resto del catálogo.
   useEffect(() => {
-    if (isAsteroids) return;
+    if (engineInit) return;
     if (over || paused) return;
     const t = setInterval(() => setScore((s) => s + Math.floor(10 + Math.random() * 90)), 220);
     return () => clearInterval(t);
-  }, [isAsteroids, over, paused]);
+  }, [engineInit, over, paused]);
 
   useEffect(() => {
-    if (isAsteroids) return;
+    if (engineInit) return;
     if (score > 0 && score % 2500 < 100) setLevel((l) => l + 1);
-  }, [isAsteroids, score]);
+  }, [engineInit, score]);
 
   const saveScore = () => {
     setSaveState("saving");
@@ -68,7 +69,7 @@ export default function GamePlayer({ game }: { game: Game }) {
   };
 
   const togglePause = () => {
-    if (isAsteroids && engineRef.current) {
+    if (engineInit && engineRef.current) {
       if (paused) engineRef.current.resume();
       else engineRef.current.pause();
     }
@@ -76,7 +77,7 @@ export default function GamePlayer({ game }: { game: Game }) {
   };
 
   const endGame = () => {
-    if (isAsteroids) engineRef.current?.pause();
+    if (engineInit) engineRef.current?.pause();
     setOver(true);
   };
 
@@ -87,7 +88,7 @@ export default function GamePlayer({ game }: { game: Game }) {
     setPaused(false);
     setOver(false);
     setSaveState("idle");
-    if (isAsteroids) engineRef.current?.restart();
+    if (engineInit) engineRef.current?.restart();
   };
 
   return (
@@ -128,7 +129,7 @@ export default function GamePlayer({ game }: { game: Game }) {
 
       <div className="crt">
         <div className="crt-screen">
-          {isAsteroids ? (
+          {engineInit ? (
             <canvas ref={canvasRef} width={800} height={600} className="game-canvas" />
           ) : (
             <div className="game-arena">
