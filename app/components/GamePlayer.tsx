@@ -130,7 +130,12 @@ export default function GamePlayer({ game }: { game: Game }) {
       <div className="crt">
         <div className="crt-screen">
           {engineInit ? (
-            <canvas ref={canvasRef} width={800} height={600} className="game-canvas" />
+            <canvas
+              ref={canvasRef}
+              width={800}
+              height={600}
+              className={"game-canvas" + (game.id === "tetris" ? " contain-fit" : "")}
+            />
           ) : (
             <div className="game-arena">
               <div className="grid-floor"></div>

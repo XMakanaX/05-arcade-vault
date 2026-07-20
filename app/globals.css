@@ -1031,6 +1031,8 @@ a {
   height: 100%;
   display: block;
   image-rendering: pixelated;
+}
+.game-canvas.contain-fit {
   object-fit: contain;
 }
 .crt-content {
